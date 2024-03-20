@@ -2,6 +2,7 @@ package mk.ukim.finki.emt.lab.web;
 
 import mk.ukim.finki.emt.lab.model.Book;
 import mk.ukim.finki.emt.lab.model.dto.BookDto;
+import mk.ukim.finki.emt.lab.model.exceptions.NoAvailableCopiesException;
 import mk.ukim.finki.emt.lab.repository.BookRepository;
 import mk.ukim.finki.emt.lab.service.BookService;
 import org.springframework.http.ResponseEntity;
@@ -51,6 +52,13 @@ public class BookRestController {
     public ResponseEntity<Book> editBook(@PathVariable Long id, @RequestBody BookDto bookDto)
     {
         return bookService.update(id, bookDto.getName(), bookDto.getCategory(), bookDto.getAuthorId(), bookDto.getAvailableCopies())
+                .map(book -> ResponseEntity.ok().body(book))
+                .orElseGet(() -> ResponseEntity.notFound().build());
+    }
+
+    @PostMapping("/rent/{id}")
+    public ResponseEntity<Book> lowerAvailableCopies(@PathVariable Long id) throws NoAvailableCopiesException {
+        return bookService.lowerAvailableCopies(id)
                 .map(book -> ResponseEntity.ok().body(book))
                 .orElseGet(() -> ResponseEntity.notFound().build());
     }

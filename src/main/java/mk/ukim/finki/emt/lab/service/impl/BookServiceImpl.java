@@ -1,5 +1,6 @@
 package mk.ukim.finki.emt.lab.service.impl;
 
+import mk.ukim.finki.emt.lab.listeners.BookEventListener;
 import mk.ukim.finki.emt.lab.model.Author;
 import mk.ukim.finki.emt.lab.model.Book;
 import mk.ukim.finki.emt.lab.model.Category;
@@ -18,10 +19,12 @@ import java.util.Optional;
 public class BookServiceImpl implements BookService {
     private final BookRepository bookRepository;
     private final AuthorRepository authorRepository;
+    private final BookEventListener bookEventListener;
 
-    public BookServiceImpl(BookRepository bookRepository, AuthorRepository authorRepository) {
+    public BookServiceImpl(BookRepository bookRepository, AuthorRepository authorRepository, BookEventListener bookEventListener) {
         this.bookRepository = bookRepository;
         this.authorRepository = authorRepository;
+        this.bookEventListener = bookEventListener;
     }
 
     @Override
@@ -40,6 +43,7 @@ public class BookServiceImpl implements BookService {
         Book book = new Book(name,category,author,availableCopies);
 
         bookRepository.save(book);
+        bookEventListener.onCreate(book);
 
         return Optional.of(book);
     }
@@ -55,6 +59,7 @@ public class BookServiceImpl implements BookService {
         book.setAvailableCopies(availableCopies);
 
         bookRepository.save(book);
+        bookEventListener.onEdit(book);
 
         return Optional.of(book);
     }
@@ -64,6 +69,7 @@ public class BookServiceImpl implements BookService {
         Book book = bookRepository.findById(id).orElseThrow(InvalidBookIdException::new);
 
         bookRepository.deleteById(id);
+        bookEventListener.onDelete(book);
 
         return Optional.of(book);
     }
