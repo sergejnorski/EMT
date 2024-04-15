@@ -11,6 +11,7 @@ import org.springframework.web.bind.annotation.*;
 import java.util.List;
 
 @RestController
+@CrossOrigin(origins = "http://localhost:3000")
 @RequestMapping("/api/books")
 public class BookRestController {
     private final BookService bookService;
@@ -40,7 +41,7 @@ public class BookRestController {
                 .orElseGet(() -> ResponseEntity.notFound().build());
     }
 
-    @PostMapping("/delete/{id}")
+    @DeleteMapping("/delete/{id}")
     public ResponseEntity<Book> deleteBook(@PathVariable Long id)
     {
         return bookService.delete(id)
